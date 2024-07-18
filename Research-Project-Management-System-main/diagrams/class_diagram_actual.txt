@@ -1,0 +1,481 @@
+@startuml
+
+package Controller {
+  class AccountController {
+    -AccountService accountService
+    +String login()
+    +String displayStudentRegistrationForm(Model model)
+    +String registerStudent(RegistrationStudentDTO registrationStudentDTO, BindingResult bindingResult)
+    +String displayFacultyRegistrationForm(Model model)
+    +String registerFaculty(RegistrationFacultyDTO registrationFacultyDTO, BindingResult bindingResult)
+    +String displayAdminDashboard(Model model)
+    +String acceptUser(String username)
+    +String rejectUser(String username)
+  }
+
+  class ProjectController {
+    -AccountService accountService
+    -ProjectService projectService
+    -MessageService messageService
+    +String home()
+    +String displayAllProjects(Model model)
+    +String displayProject(Integer projectId, Model model)
+    +String displayProjectCreateForm(Model model)
+    +String createProject(ProjectDTO projectDTO, BindingResult bindingResult, UsernamesDTO studentUsernames, UsernamesDTO facultyUsernames, Model model)
+    +String displayProjectUpdateForm(Integer projectId, Model model)
+    +String updateProject(ProjectDTO projectDTO, BindingResult bindingResult, String projectId, UsernamesDTO studentUsernames, UsernamesDTO facultyUsernames, Model model)
+    +String deleteProject(String projectId)
+    +String addMessage(String projectId, String content)
+  }
+}
+
+package Service {
+  interface AccountService {
+    String getSessionAccount()
+    boolean isAccountPresent(String username)
+    boolean isAccountNotPresent(String username)
+    boolean isStudent(String username)
+    boolean isFaculty(String username)
+    boolean isAdmin(String username)
+    Account getAccountRaw(String username)
+    boolean saveAccount(RegistrationStudentDTO registrationStudentDTO)
+    boolean saveAccount(RegistrationFacultyDTO registrationFacultyDTO)
+    List<StudentDTO> getStudentsPending()
+    List<FacultyDTO> getFacultyPending()
+    List<String> getStudentsAccepted()
+    List<String> getFacultyAccepted()
+    boolean acceptAccount(String username)
+    boolean rejectAccount(String username)
+  }
+
+  class AccountServiceImplementation {
+    -AccountRepository accountRepository
+    -StudentService studentService
+    -FacultyService facultyService
+    +UserDetails loadUserByUsername(String username)
+    +String getSessionAccount()
+    +boolean isAccountPresent(String username)
+    +boolean isAccountNotPresent(String username)
+    +boolean isStudent(String username)
+    +boolean isFaculty(String username)
+    +boolean isAdmin(String username)
+    +Account getAccountRaw(String username)
+    +boolean saveAccount(RegistrationStudentDTO registrationStudentDTO)
+    +boolean saveAccount(RegistrationFacultyDTO registrationFacultyDTO)
+    +List<StudentDTO> getStudentsPending()
+    +List<FacultyDTO> getFacultyPending()
+    +List<String> getStudentsAccepted()
+    +List<String> getFacultyAccepted()
+    +boolean acceptAccount(String username)
+    +boolean rejectAccount(String username)
+  }
+
+  interface StudentService {
+    boolean saveStudent(Student student)
+    boolean deleteStudent(String username)
+    List<StudentDTO> getStudents(List<String> usernames)
+    List<Project> getProjects(String username)
+    List<Student> getStudentsRaw(List<String> usernames)
+  }
+
+  class StudentServiceImplementation {
+    -StudentRepository studentRepository
+    +boolean saveStudent(Student student)
+    +boolean deleteStudent(String username)
+    +List<StudentDTO> getStudents(List<String> usernames)
+    +List<Project> getProjects(String username)
+    +List<Student> getStudentsRaw(List<String> usernames)
+  }
+
+  interface FacultyService {
+    boolean saveFaculty(Faculty faculty)
+    boolean deleteFaculty(String username)
+    List<FacultyDTO> getFaculty(List<String> usernames)
+    List<Project> getProjects(String username)
+    List<Faculty> getFacultyRaw(List<String> usernames)
+  }
+
+  class FacultyServiceImplementation {
+    -FacultyRepository facultyRepository
+    +boolean saveFaculty(Faculty faculty)
+    +boolean deleteFaculty(String username)
+    +List<FacultyDTO> getFaculty(List<String> usernames)
+    +List<Project> getProjects(String username)
+    +List<Faculty> getFacultyRaw(List<String> usernames)
+  }
+
+  interface ProjectService {
+    List<ProjectDTO> getProjects()
+    List<ProjectDTO> getProjects(String username)
+    boolean isAccountInProject(String username, Integer projectId)
+    boolean isAccountNotInProject(String username, Integer projectId)
+    boolean isProjectPresent(Integer projectId)
+    ProjectDTO getProject(Integer projectId)
+    Project getProjectRaw(Integer projectId)
+    List<String> getStudentNames(Integer projectId)
+    List<String> getFacultyNames(Integer projectId)
+    boolean saveProject(ProjectDTO projectDTO, List<String> studentUsernames, List<String> facultyUsernames)
+    boolean deleteProject(Integer projectId)
+    List<Message> getMessages(Integer projectId)
+  }
+
+  class ProjectServiceImplementation {
+    -ProjectRepository projectRepository
+    -AccountService accountService
+    -StudentService studentService
+    -FacultyService facultyService
+    +List<ProjectDTO> getProjects()
+    +List<ProjectDTO> getProjects(String username)
+    +boolean isAccountInProject(String username, Integer projectId)
+    +boolean isAccountNotInProject(String username, Integer projectId)
+    +boolean isProjectPresent(Integer projectId)
+    +ProjectDTO getProject(Integer projectId)
+    +Project getProjectRaw(Integer projectId)
+    +List<String> getStudentNames(Integer projectId)
+    +List<String> getFacultyNames(Integer projectId)
+    +boolean saveProject(ProjectDTO projectDTO, List<String> studentUsernames, List<String> facultyUsernames)
+    +boolean deleteProject(Integer projectId)
+    +List<Message> getMessages(Integer projectId)
+  }
+
+  interface MessageService {
+    List<MessageDTO> getMessages(Integer projectId)
+    boolean addMessage(String username, Integer projectID, String content)
+  }
+
+  class MessageServiceImplementation {
+    -MessageRepository messageRepository
+    -ProjectService projectService
+    -AccountService accountService
+    +List<MessageDTO> getMessages(Integer projectId)
+    +boolean addMessage(String username, Integer projectID, String content)
+  }
+}
+
+package DTO {
+  class RegistrationStudentDTO {
+    -String username
+    -String password
+    -String firstName
+    -String lastName
+    -Department department
+    -Integer semester
+    -String section
+  }  
+
+  class RegistrationFacultyDTO {
+    -String username
+    -String password
+    -String firstName
+    -String lastName
+    -Department department
+    -String domain
+  }
+
+  class StudentDTO {
+    -String username
+    -String firstName
+    -String lastName
+    -Department department
+    -Integer semester
+    -Character section
+  }
+
+  class FacultyDTO {
+    -String username
+    -String firstName
+    -String lastName
+    -Department department
+    -String domain
+  }
+
+  class UsernamesDTO {
+    -List<String> usernames
+  }
+
+  class ProjectDTO {
+    -Integer id
+    -String title
+    -Date startDate
+    -Date endDate
+    -Status status
+    +boolean isValidRange()
+  }
+
+  class MessageDTO {
+    -String name
+    -String content
+    -Timestamp timestamp
+  }
+}
+
+package Mapper {
+  class AccountMapper {
+    {static} Account mapRegistrationToAccount(RegistrationStudentDTO registrationStudentDTO)
+    {static} Account mapRegistrationToAccount(RegistrationFacultyDTO registrationFacultyDTO)
+  }
+
+  class StudentMapper {
+    {static} Student mapRegistrationToStudent(RegistrationStudentDTO registrationStudentDTO)
+    {static} StudentDTO mapStudentToStudentDTO(Student student)
+  }
+
+  class FacultyMapper {
+    {static} Faculty mapRegistrationToFaculty(RegistrationFacultyDTO registrationFacultyDTO)
+    {static} FacultyDTO mapFacultyToFacultyDTO(Faculty faculty)
+  }
+
+  class ProjectMapper {
+    {static} ProjectDTO mapProjectToProjectDTO(Project project)
+    {static} Project mapProjectDTOToProject(ProjectDTO projectDTO)
+  }
+
+  class MessageMapper {
+    {static} MessageDTO mapMessageToMessageDTO(Message message)
+  }
+}
+
+package Repository {
+  interface AccountRepository {
+    Optional<Account> findById(String Id)
+    Account save(Account entity)
+    Void delete(Account entity)
+    List<Account> findAllByIsApprovedIsFalseAndTypeIs(AccountType accountType)
+    List<Account> findAllByIsApprovedIsTrueAndTypeIs(AccountType accountType)
+  }
+
+  interface StudentRepository {
+    Optional<Student> findById(String Id)
+    List<Student> findAllById(String Id)
+    Student save(Student entity)
+    Void deleteById(Student entity)
+  }
+
+  interface FacultyRepository {
+    Optional<Faculty> findById(String Id)
+    List<Faculty> findAllById(String Id)
+    Faculty save(Faculty entity)
+    Void deleteById(Faculty entity)
+  }
+
+  interface ProjectRepository {
+    Optional<Project> findById(String Id)
+    Project save(Project entity)
+    Void deleteById(Project entity)
+    List<Project> findAllByStatusIs(Status status)
+  }
+
+  interface MessageRepository {
+    Message save(Message entity)
+  }
+}
+
+package Model {
+  class Account {
+    -String username
+    -String password
+    -String firstName
+    -String lastName
+    -AccountType type
+    -Boolean isApproved
+    -List<Message> messageList
+  }
+
+  class Student {
+    -String id
+    -Department department
+    -Integer semester
+    -Character section
+    -Account account
+    -List<Project> projectList
+  }
+
+  class Faculty {
+    -String id
+    -Department department
+    -String domain
+    -Account account
+    -List<Project> projectList
+  }
+
+  class Project {
+    -Integer id
+    -String title
+    -Date startDate
+    -Date endDate
+    -Status status
+    -List<Student> studentList
+    -List<Faculty> facultyList
+    -List<Message> messageList
+  }
+
+  class Message {
+    -Integer id
+    -String content
+    -Timestamp timestamp
+    -Project project
+    -Account account
+  }
+
+  enum AccountType {
+    STUDENT
+    FACULTY
+    ADMIN
+  }
+
+  enum Department {
+    CSE
+    ECE
+    EEE
+    AIML
+    ME
+  }
+
+  enum Status {
+    PUBLISHED
+    ONGOING
+  }
+}
+
+AccountServiceImplementation ..|> AccountService
+StudentServiceImplementation ..|> StudentService
+FacultyServiceImplementation ..|> FacultyService
+ProjectServiceImplementation ..|> ProjectService
+MessageServiceImplementation ..|> MessageService
+
+AccountController ..> RegistrationStudentDTO
+AccountController ..> RegistrationFacultyDTO
+AccountController ..> StudentDTO
+AccountController ..> FacultyDTO
+
+ProjectController ..> ProjectDTO
+ProjectController ..> UsernamesDTO
+ProjectController ..> MessageDTO
+ProjectController ..> Status
+
+AccountService ..> RegistrationStudentDTO
+AccountService ..> RegistrationFacultyDTO
+AccountService ..> StudentDTO
+AccountService ..> FacultyDTO
+AccountService ..> Account
+
+AccountServiceImplementation ..> RegistrationStudentDTO
+AccountServiceImplementation ..> RegistrationFacultyDTO
+AccountServiceImplementation ..> StudentDTO
+AccountServiceImplementation ..> FacultyDTO
+AccountServiceImplementation ..> Account
+
+AccountServiceImplementation ..> AccountType
+AccountServiceImplementation ..> Student
+AccountServiceImplementation ..> Faculty
+AccountServiceImplementation ..> AccountMapper
+AccountServiceImplementation ..> StudentMapper
+AccountServiceImplementation ..> FacultyMapper
+
+StudentService ..> StudentDTO
+StudentService ..> Project
+StudentService ..> Student
+
+StudentServiceImplementation ..> StudentDTO
+StudentServiceImplementation ..> Project
+StudentServiceImplementation ..> Student
+
+StudentServiceImplementation ..> StudentMapper
+
+FacultyService ..> FacultyDTO
+FacultyService ..> Project
+FacultyService ..> Faculty
+
+FacultyServiceImplementation ..> FacultyDTO
+FacultyServiceImplementation ..> Project
+FacultyServiceImplementation ..> Faculty
+
+FacultyServiceImplementation ..> FacultyMapper
+
+ProjectService ..> ProjectDTO
+ProjectService ..> Project
+ProjectService ..> Message
+
+ProjectServiceImplementation ..> ProjectDTO
+ProjectServiceImplementation ..> Project
+ProjectServiceImplementation ..> Message
+
+ProjectServiceImplementation ..> ProjectMapper
+ProjectServiceImplementation ..> Status
+ProjectServiceImplementation ..> Student
+ProjectServiceImplementation ..> Faculty
+
+MessageService ..> MessageDTO
+
+MessageServiceImplementation ..> MessageDTO
+
+MessageServiceImplementation ..> MessageMapper
+MessageServiceImplementation ..> Message
+
+AccountRepository ..> Account
+StudentRepository ..> Student
+FacultyRepository ..> Faculty
+ProjectRepository ..> Project
+MessageRepository ..> Message
+
+AccountMapper ..> Account
+AccountMapper ..> RegistrationStudentDTO
+AccountMapper ..> RegistrationFacultyDTO
+
+StudentMapper ..> Student
+StudentMapper ..> StudentDTO
+StudentMapper ..> RegistrationStudentDTO
+
+FacultyMapper ..> Faculty
+FacultyMapper ..> FacultyDTO
+FacultyMapper ..> RegistrationFacultyDTO
+
+ProjectMapper ..> Project
+ProjectMapper ..> ProjectDTO
+
+MessageMapper ..> Message
+MessageMapper ..> MessageDTO
+
+ProjectController o-- ProjectService
+ProjectController o-- AccountService
+ProjectController o-- MessageService
+
+AccountController o-- AccountService
+
+AccountServiceImplementation o-- AccountRepository
+AccountServiceImplementation o-- StudentService
+AccountServiceImplementation o-- FacultyService
+
+StudentServiceImplementation o-- StudentRepository
+
+FacultyServiceImplementation o-- FacultyRepository
+
+ProjectServiceImplementation o-- ProjectRepository
+ProjectServiceImplementation o-- AccountService
+ProjectServiceImplementation o-- StudentService
+ProjectServiceImplementation o-- FacultyService
+
+MessageServiceImplementation o-- MessageRepository
+
+RegistrationStudentDTO o-- Department
+RegistrationFacultyDTO o-- Department
+StudentDTO o-- Department
+FacultyDTO o-- Department
+ProjectDTO o-- Status
+
+Account *-- AccountType
+Student o-- Department
+Faculty o-- Department
+Project *-- Status
+
+Account "1" -- "0..*" Message
+
+Student "1" --> "1" Account
+Student "1..*" -- "0..*" Project
+
+Faculty "1" --> "1" Account
+Faculty "1..*" -- "0..*" Project
+
+Project "1" -- "0..*" Message
+
+@enduml

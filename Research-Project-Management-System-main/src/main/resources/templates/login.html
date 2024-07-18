@@ -1,0 +1,68 @@
+<!--
+/login
+
+i/o taken care of by spring security
+-->
+<!--
+Form Input -
+    String Username
+    String Password
+
+    Button -
+        Sign In - POST /login
+                - REDIRECT /projects (if student or faculty)
+                - REDIRECT /adminDashboard (if admin)
+
+Button -
+    Login as Guest - GET /
+    Register Student - GET /registerStudent
+    Register Faculty - GET /registerFaculty
+-->
+<!--
+param.registered - You have successfully registered, try logging later
+param.error - Invalid username and password
+param.logout - You have been logged out
+-->
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+</head>
+<body>
+<div>
+    <div>
+        <div th:if="${param.error}">
+            Invalid username and password.
+        </div>
+        <div th:if="${param.logout}">
+            You have been logged out.
+        </div>
+        <div th:if="${param.registered}">
+            You have successfully registered, try logging in later.
+        </div>
+    </div>
+    <h1>Login</h1>
+    <form th:action="@{/login}" method="post">
+        <label> Username:
+            <input type="text" name="username"/>
+        </label>
+        <br/>
+        <label> Password:
+            <input type="password" name="password"/>
+        </label>
+        <br/>
+        <input type="submit" value="Log In"/>
+    </form>
+    <div>
+        <a th:href="@{/}">Login As Guest</a>
+        <br/>
+        Need An Account?
+        <br/>
+        <a th:href="@{/registerStudent}">Register As Student</a>
+        <br/>
+        <a th:href="@{/registerFaculty}">Register As Faculty</a>
+    </div>
+</div>
+</body>
+</html>

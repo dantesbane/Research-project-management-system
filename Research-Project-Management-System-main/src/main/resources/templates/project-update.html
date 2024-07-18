@@ -1,0 +1,108 @@
+<!--
+/project/{projectId}/update
+
+i/o - ProjectDTO
+    - List<String> Student Usernames (needs to be validated)
+    - List<String> Faculty Usernames (needs to be validated)
+
+ProjectService
+    boolean isProjectPresent(Integer projectId);
+    List<String> getStudentNames(Integer projectId);
+    List<String> getFacultyNames(Integer projectId);
+
+    boolean saveProject(ProjectDTO projectDTO, List<String> studentUsernames, List<String> facultyUsernames);
+
+    boolean isAccountInProject(String username, Integer projectId);
+
+AccountService
+    boolean isStudent(String username);
+    boolean isFaculty(String username);
+-->
+<!--
+Form Input -
+    String Title
+    Date Start Date
+    Date End Date (optional)
+    enum Status Status
+
+    List<String> Student Usernames (One of these must include the user)
+    List<String> Faculty Usernames
+
+    Button -
+        Submit - POST /project/{projectId}/update
+                 REDIRECT /project/{projectId}
+
+Links -
+    Project Detailed View - GET /project/{projectId}
+-->
+<!--
+For each field (except department):
+    th:if="${#fields.hasErrors('<field>')}" th:errors="*{<field>}"
+-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Update Project</title>
+</head>
+<body>
+<div>
+    <h1>Update Project</h1>
+    <form th:action="@{/project/{projectId}/update(projectId=${projectDTO.id})}" method="post">
+        <div>
+            <div>
+                <label for="title">Title:</label>
+                <input type="text" id="title" th:field="*{projectDTO.title}" required/>
+                <div th:if="${#fields.hasErrors('projectDTO.title')}"
+                     th:errors="*{projectDTO.title}"></div>
+            </div>
+            <div>
+                <label for="startDate">Start Date:</label>
+                <input type="date" id="startDate" th:field="*{projectDTO.startDate}" required/>
+                <div th:if="${#fields.hasErrors('projectDTO.startDate')}"
+                     th:errors="*{projectDTO.startDate}"></div>
+            </div>
+            <div>
+                <label for="endDate">End Date:</label>
+                <input type="date" id="endDate" th:field="*{projectDTO.endDate}"/>
+                <div th:if="${#fields.hasErrors('projectDTO.endDate')}"
+                     th:errors="*{projectDTO.endDate}"></div>
+                <div th:if="${#fields.hasErrors('projectDTO.validRange')}"
+                     th:errors="*{projectDTO.validRange}"></div>
+            </div>
+            <div>
+                <label for="status">Status:</label>
+                <select id="status" th:field="*{projectDTO.status}">
+                    <option th:each="status : ${T(rpms.models.enums.Status).values()}"
+                            th:value="${status}" th:text="${status}"></option>
+                </select>
+            </div>
+            <div>
+                <label for="studentUsernames">Student Usernames:</label>
+                <br>
+                <select id="studentUsernames" th:field="*{studentUsernames.usernames}" required multiple>
+                    <option th:each="username : ${studentUsernames.usernames}"
+                            th:value="${username}"
+                            th:text="${username}"></option>
+                </select>
+            </div>
+            <div>
+                <label for="facultyUsernames">Faculty Usernames:</label>
+                <br>
+                <select id="facultyUsernames" th:field="*{facultyUsernames.usernames}" required multiple>
+                    <option th:each="username : ${facultyUsernames.usernames}"
+                            th:value="${username}"
+                            th:text="${username}"></option>
+                </select>
+            </div>
+        </div>
+        <div>
+            <button type="submit" name="createProject" value="createProject">Update Project</button>
+        </div>
+    </form>
+    <div>
+        <a th:href="@{/project/{projectId}(projectId=${projectDTO.id})}">Go Back</a>
+    </div>
+</div>
+</body>
+</html>

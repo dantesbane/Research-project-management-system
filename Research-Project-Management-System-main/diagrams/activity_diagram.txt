@@ -1,0 +1,55 @@
+@startuml
+
+|Student/Faculty|
+start
+:Register Account;
+
+|Admin|
+:View Accounts;
+if (Approve Account?) then (Yes)
+    |Student/Faculty|
+    :Login;
+else (no)
+    |Admin|
+    stop
+endif
+
+|Student/Faculty|
+
+repeat
+:View Projects;
+split
+    :Create Project;
+split again
+    repeat
+    :View Project Details;
+    split
+        :Delete Project;
+        end
+    split again
+        :Add Message;
+    split again
+        :Edit Project;
+    end split
+    repeat while
+split again
+    :Logout;
+    stop
+end split
+repeat while ()
+kill
+
+|Guest|
+start
+:Login;
+repeat
+:View Published Projects;
+split
+    :Logout;
+    stop
+split again
+    :View Project Details;
+end split
+repeat while ()
+
+@enduml

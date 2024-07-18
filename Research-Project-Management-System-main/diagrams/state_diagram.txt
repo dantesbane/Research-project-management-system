@@ -1,0 +1,63 @@
+@startuml
+hide empty description
+
+state "Login\nForm" as LF
+
+state Registration {
+    state "Student\nRegistration\nForm" as SRF
+    state "Faculty\nRegistration\nForm" as FRF
+}
+
+state "Guest Actions" as GA {
+    state "Guest\nDashboard" as GD
+    state "Project\nDetails\nFor Guest" as PDFG
+}
+
+state "Admin Actions" as AA {
+    state "Admin\nDashboard" as AD
+}
+
+state "Student/Faculty Actions" as SFA {
+    state "Student/Faculty\nDashboard" as SFD
+    state "Project\nDetails" as PD
+    state "Project\nCreation\nForm" as PCF
+    state "Project\nUpdation\nForm" as PUF
+}
+
+[*] --> LF
+LF --> [*]
+
+LF -left-> SRF : Display\nStudent\nForm
+SRF --> LF : Display\nLogin\nForm
+SRF --> LF : Registered\nSuccessfully
+LF --> FRF : Display\nFaculty\nForm
+FRF --> LF : Display\nLogin\nForm 
+FRF --> LF : Registered\nSuccessfully
+SRF --> FRF : Display\nFaculty\nForm
+FRF --> SRF : Display\nStudent\nForm
+
+LF --> GD : Login as\nGuest
+GD --> LF : Logout
+GD --> PDFG : View\nProject\nDetails
+PDFG --> GD : Go\nBack
+
+LF --> AD : Login as\nAdmin
+AD --> LF : Logout
+AD --> AD : Accept/Reject\nRegistered\nAccount
+
+LF --> SFD : Login as\nStudent/Faculty
+SFD --> LF : Logout
+
+SFD --> PD : View\nProject\nDetails
+PD --> SFD : Go\nBack
+
+PD --> SFD : Delete\nProject
+PD --> PD : Add\nMessage
+PD --> PUF : Display\nProject\nUpdation\nForm
+PUF --> PD : Go\nBack
+PUF --> PD : Updated\nSuccessfully
+
+SFD --> PCF : Display\nProject\nCreation\nForm
+PCF --> SFD : Go\nBack
+PCF --> SFD : Created\nSuccessfully
+@enduml

@@ -1,0 +1,481 @@
+@startuml
+
+package Controller {
+  class AccountController {
+    -AccountService
+    +login()
+    +displayStudentRegistrationForm()
+    +registerStudent()
+    +displayFacultyRegistrationForm()
+    +registerFaculty()
+    +displayAdminDashboard()
+    +acceptUser()
+    +rejectUser()
+  }
+
+  class ProjectController {
+    -AccountService
+    -ProjectService
+    -MessageService
+    +home()
+    +displayAllProjects()
+    +displayProject()
+    +displayProjectCreateForm()
+    +createProject()
+    +displayProjectUpdateForm()
+    +updateProject()
+    +deleteProject()
+    +addMessage()
+  }
+}
+
+package Service {
+  interface AccountService {
+    getSessionAccount()
+    isAccountPresent()
+    isAccountNotPresent()
+    isStudent()
+    isFaculty()
+    isAdmin()
+    getAccountRaw()
+    saveAccount()
+    saveAccount()
+    getStudentsPending()
+    getFacultyPending()
+    getStudentsAccepted()
+    getFacultyAccepted()
+    acceptAccount()
+    rejectAccount()
+  }
+
+  class AccountServiceImplementation {
+    -AccountRepository
+    -StudentService
+    -FacultyService
+    +loadUserByUsername()
+    +getSessionAccount()
+    +isAccountPresent()
+    +isAccountNotPresent()
+    +isStudent()
+    +isFaculty()
+    +isAdmin()
+    +getAccountRaw()
+    +saveAccount()
+    +saveAccount()
+    +getStudentsPending()
+    +getFacultyPending()
+    +getStudentsAccepted()
+    +getFacultyAccepted()
+    +acceptAccount()
+    +rejectAccount()
+  }
+
+  interface StudentService {
+    saveStudent()
+    deleteStudent()
+    getStudents()
+    getProjects()
+    getStudentsRaw()
+  }
+
+  class StudentServiceImplementation {
+    -StudentRepository
+    +saveStudent()
+    +deleteStudent()
+    +getStudents()
+    +getProjects()
+    +getStudentsRaw()
+  }
+
+  interface FacultyService {
+    saveFaculty()
+    deleteFaculty()
+    getFaculty()
+    getProjects()
+    getFacultyRaw()
+  }
+
+  class FacultyServiceImplementation {
+    -FacultyRepository
+    +saveFaculty()
+    +deleteFaculty()
+    +getFaculty()
+    +getProjects()
+    +getFacultyRaw()
+  }
+
+  interface ProjectService {
+    getProjects()
+    getProjects()
+    isAccountInProject()
+    isAccountNotInProject()
+    isProjectPresent()
+    getProject()
+    getProjectRaw()
+    getStudentNames()
+    getFacultyNames()
+    saveProject()
+    deleteProject()
+    getMessages()
+  }
+
+  class ProjectServiceImplementation {
+    -ProjectRepository
+    -AccountService
+    -StudentService
+    -FacultyService
+    +getProjects()
+    +getProjects()
+    +isAccountInProject()
+    +isAccountNotInProject()
+    +isProjectPresent()
+    +getProject()
+    +getProjectRaw()
+    +getStudentNames()
+    +getFacultyNames()
+    +saveProject()
+    +deleteProject()
+    +getMessages()
+  }
+
+  interface MessageService {
+    getMessages()
+    addMessage()
+  }
+
+  class MessageServiceImplementation {
+    -MessageRepository
+    -ProjectService
+    -AccountService
+    +getMessages()
+    +addMessage()
+  }
+}
+
+package DTO {
+  class RegistrationStudentDTO {
+    -username
+    -password
+    -firstName
+    -lastName
+    -department
+    -semester
+    -section
+  }
+
+  class RegistrationFacultyDTO {
+    -username
+    -password
+    -firstName
+    -lastName
+    -department
+    -domain
+  }
+
+  class StudentDTO {
+    -username
+    -firstName
+    -lastName
+    -department
+    -semester
+    -section
+  }
+
+  class FacultyDTO {
+    -username
+    -firstName
+    -lastName
+    -department
+    -domain
+  }
+
+  class UsernamesDTO {
+    -usernames
+  }
+
+  class ProjectDTO {
+    -id
+    -title
+    -startDate
+    -endDate
+    -status
+    +isValidRange()
+  }
+
+  class MessageDTO {
+    -name
+    -content
+    -timestamp
+  }
+}
+
+package Mapper {
+  class AccountMapper {
+    {static} mapRegistrationToAccount()
+    {static} mapRegistrationToAccount()
+  }
+
+  class StudentMapper {
+    {static} mapRegistrationToStudent()
+    {static} mapStudentToStudentDTO()
+  }
+
+  class FacultyMapper {
+    {static} mapRegistrationToFaculty()
+    {static} mapFacultyToFacultyDTO()
+  }
+
+  class ProjectMapper {
+    {static} mapProjectToProjectDTO()
+    {static} mapProjectDTOToProject()
+  }
+
+  class MessageMapper {
+    {static} MessageDTO mapMessageToMessageDTO()
+  }
+}
+
+package Model {
+  class Account {
+    -username
+    -password
+    -firstName
+    -lastName
+    -type
+    -isApproved
+    -messageList
+  }
+
+  class Student {
+    -id
+    -department
+    -semester
+    -section
+    -account
+    -projectList
+  }
+
+  class Faculty {
+    -id
+    -department
+    -domain
+    -account
+    -projectList
+  }
+
+  class Project {
+    -id
+    -title
+    -startDate
+    -endDate
+    -status
+    -studentList
+    -facultyList
+    -messageList
+  }
+
+  class Message {
+    -id
+    -content
+    -timestamp
+    -project
+    -account
+  }
+
+  enum AccountType {
+    STUDENT
+    FACULTY
+    ADMIN
+  }
+
+  enum Department {
+    CSE
+    ECE
+    EEE
+    AIML
+    ME
+  }
+
+  enum Status {
+    PUBLISHED
+    ONGOING
+  }
+}
+
+package Repository {
+  interface AccountRepository {
+    findById()
+    save()
+    delete()
+    findAllByIsApprovedIsFalseAndTypeIs()
+    findAllByIsApprovedIsTrueAndTypeIs()
+  }
+
+  interface StudentRepository {
+    findById()
+    findAllById()
+    save()
+    deleteById()
+  }
+
+  interface FacultyRepository {
+    findById()
+    findAllById()
+    save()
+    deleteById()
+  }
+
+  interface ProjectRepository {
+    findById()
+    save()
+    deleteById()
+    findAllByStatusIs()
+  }
+
+  interface MessageRepository {
+    save()
+  }
+}
+
+AccountServiceImplementation ..|> AccountService
+StudentServiceImplementation ..|> StudentService
+FacultyServiceImplementation ..|> FacultyService
+ProjectServiceImplementation ..|> ProjectService
+MessageServiceImplementation ..|> MessageService
+
+AccountController ..> RegistrationStudentDTO
+AccountController ..> RegistrationFacultyDTO
+AccountController ..> StudentDTO
+AccountController ..> FacultyDTO
+
+ProjectController ..> ProjectDTO
+ProjectController ..> UsernamesDTO
+ProjectController ..> MessageDTO
+ProjectController ..> Status
+
+AccountService ..> RegistrationStudentDTO
+AccountService ..> RegistrationFacultyDTO
+AccountService ..> StudentDTO
+AccountService ..> FacultyDTO
+AccountService ..> Account
+
+AccountServiceImplementation ..> RegistrationStudentDTO
+AccountServiceImplementation ..> RegistrationFacultyDTO
+AccountServiceImplementation ..> StudentDTO
+AccountServiceImplementation ..> FacultyDTO
+AccountServiceImplementation ..> Account
+
+AccountServiceImplementation ..> AccountType
+AccountServiceImplementation ..> Student
+AccountServiceImplementation ..> Faculty
+AccountServiceImplementation ..> AccountMapper
+AccountServiceImplementation ..> StudentMapper
+AccountServiceImplementation ..> FacultyMapper
+
+StudentService ..> StudentDTO
+StudentService ..> Project
+StudentService ..> Student
+
+StudentServiceImplementation ..> StudentDTO
+StudentServiceImplementation ..> Project
+StudentServiceImplementation ..> Student
+
+StudentServiceImplementation ..> StudentMapper
+
+FacultyService ..> FacultyDTO
+FacultyService ..> Project
+FacultyService ..> Faculty
+
+FacultyServiceImplementation ..> FacultyDTO
+FacultyServiceImplementation ..> Project
+FacultyServiceImplementation ..> Faculty
+
+FacultyServiceImplementation ..> FacultyMapper
+
+ProjectService ..> ProjectDTO
+ProjectService ..> Project
+ProjectService ..> Message
+
+ProjectServiceImplementation ..> ProjectDTO
+ProjectServiceImplementation ..> Project
+ProjectServiceImplementation ..> Message
+
+ProjectServiceImplementation ..> ProjectMapper
+ProjectServiceImplementation ..> Status
+ProjectServiceImplementation ..> Student
+ProjectServiceImplementation ..> Faculty
+
+MessageService ..> MessageDTO
+
+MessageServiceImplementation ..> MessageDTO
+
+MessageServiceImplementation ..> MessageMapper
+MessageServiceImplementation ..> Message
+
+AccountRepository ..> Account
+StudentRepository ..> Student
+FacultyRepository ..> Faculty
+ProjectRepository ..> Project
+MessageRepository ..> Message
+
+AccountMapper ..> Account
+AccountMapper ..> RegistrationStudentDTO
+AccountMapper ..> RegistrationFacultyDTO
+
+StudentMapper ..> Student
+StudentMapper ..> StudentDTO
+StudentMapper ..> RegistrationStudentDTO
+
+FacultyMapper ..> Faculty
+FacultyMapper ..> FacultyDTO
+FacultyMapper ..> RegistrationFacultyDTO
+
+ProjectMapper ..> Project
+ProjectMapper ..> ProjectDTO
+
+MessageMapper ..> Message
+MessageMapper ..> MessageDTO
+
+ProjectController o-- ProjectService
+ProjectController o-- AccountService
+ProjectController o-- MessageService
+
+AccountController o-- AccountService
+
+AccountServiceImplementation o-- AccountRepository
+AccountServiceImplementation o-- StudentService
+AccountServiceImplementation o-- FacultyService
+
+StudentServiceImplementation o-- StudentRepository
+
+FacultyServiceImplementation o-- FacultyRepository
+
+ProjectServiceImplementation o-- ProjectRepository
+ProjectServiceImplementation o-- AccountService
+ProjectServiceImplementation o-- StudentService
+ProjectServiceImplementation o-- FacultyService
+
+MessageServiceImplementation o-- MessageRepository
+
+RegistrationStudentDTO o-- Department
+RegistrationFacultyDTO o-- Department
+StudentDTO o-- Department
+FacultyDTO o-- Department
+ProjectDTO o-- Status
+
+Account *-- AccountType
+Student o-- Department
+Faculty o-- Department
+Project *-- Status
+
+Account "1" -- "0..*" Message
+
+Student "1" --> "1" Account
+Student "1..*" -- "0..*" Project
+
+Faculty "1" --> "1" Account
+Faculty "1..*" -- "0..*" Project
+
+Project "1" -- "0..*" Message
+
+@enduml
